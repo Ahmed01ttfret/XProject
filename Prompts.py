@@ -38,7 +38,9 @@ def Write(text):
   elif len(data)==0:
     data=text
   else:
-    data[0]=text[0]
+    
+    data.pop(0)
+    data.append(text[0])
 
   with open("data.json", "w") as f:
     json.dump(data, f)
