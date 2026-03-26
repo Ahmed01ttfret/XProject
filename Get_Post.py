@@ -17,4 +17,4 @@ def Post_tweet(text):
         
         client.create_tweet(text=text)
     except Exception as e:
-        pass
+        print(e)
