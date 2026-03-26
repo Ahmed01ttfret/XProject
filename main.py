@@ -5,6 +5,6 @@ try:
     post=create_post()
     Post_tweet(post)
     print('Done')
-except Exception:
+except Exception as e:
     pass
 
