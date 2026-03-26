@@ -44,7 +44,7 @@ jobs:
       - name: Run script
         run: python main.py
         env:
-          GX_api_key: ${{ secrets.X_api_key }}
+          X_api_key: ${{ secrets.X_api_key }}
           X_api_secrete: ${{ secrets.X_api_secrete }}
           X_AccessToken: ${{ secrets.X_AccessToken }}
           X_Access_Token_Secret: ${{ secrets.X_Access_Token_Secret }}
