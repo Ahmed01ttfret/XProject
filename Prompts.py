@@ -1,92 +1,19 @@
 
-from openai import OpenAI
 from datetime import datetime
-import json
-from google import genai
-import requests as rq
-import os
+from AI_call import AI_fetch
+
+from Write_to_json import *
 
 
 
 
 
-def Football_news():
 
-  try:
-    url = "https://football-news11.p.rapidapi.com/api/news-by-league"
-
-    querystring = {"league_id":"52","lang":"en","page":"1"}
-
-    headers = {
-      "x-rapidapi-key": os.getenv('X_rapidapi'),
-      "x-rapidapi-host": "football-news11.p.rapidapi.com"
-    }
-
-    response = rq.get(url, headers=headers, params=querystring)
-
-    return response.json()
-
-  except Exception:
-    return ''
-
-
-
-def Write(text):
-  data=Read_last_3()
-  if len(data)<10 and len(data)>0:
-    data.append(text[0])
-  elif len(data)==0:
-    data=text
-  else:
-    
-    data.pop(0)
-    data.append(text[0])
-
-  with open("data.json", "w") as f:
-    json.dump(data, f)
-
-def Read_last_3():
-  with open("data.json", "r") as f:
-    data = json.load(f)
-    return data
 
 last_3=Read_last_3()
 
-News=Football_news()
 
-def AI_fetch(ai_prompt):
-    try:
-        client = genai.Client(api_key=os.getenv('GEMINI_API_KEY'))
 
-        response = client.models.generate_content(
-            model="gemini-2.5-flash", contents=ai_prompt
-        )
-        return response.text.replace('*','')
-
-      
-        
-    except Exception:
-        client = OpenAI(
-        base_url="https://openrouter.ai/api/v1", 
-        api_key=os.getenv('X_backupai'),
-        )
-
-        # First API call with reasoning
-        response = client.chat.completions.create(
-        model="meta-llama/llama-3.3-70b-instruct:free", 
-        messages=[
-                {
-                    "role": "user",
-                    "content": ai_prompt
-                }
-                ],
-        extra_body={"reasoning": {"enabled": True}}
-        )
-
-        # Extract the assistant message with reasoning_details
-        return response.choices[0].message.content.replace('*','')
-
-       
     
 
 promt="""
@@ -162,6 +89,7 @@ def Post(compname, data):
         Must be true based on the data.
 
         No personal insults; football performance only.
+        Avoid adding names that is not in the provided data
 
         Keep it to one sentence.
 
@@ -176,7 +104,7 @@ def Post(compname, data):
 
     return AI_fetch(prompt)
 
-def Selection(ids, matches):
+def Selection(ids, matches,news):
     prompt_for_selection =f"""
     You are the AI engine powering a football X (Twitter) bot. Your task is to analyze match data and determine the single best action for the next tweet.
 
@@ -254,7 +182,7 @@ def Selection(ids, matches):
 
     ids = {ids}
     matches = {matches}
-    new= {News}
+    new= {news}
 
     YOUR RESPONSE:
     Return exactly one dictionary string matching the formats above.

@@ -2,6 +2,7 @@
 import random
 
 import ast
+
 from Prompts import *
 import time
 import os
@@ -9,12 +10,42 @@ import requests as rq
 from datetime import datetime, timedelta
 
 
+competitions = {
+    "FIFA World Cup": "WC",
+    "UEFA Champions League": "CL",
+    "Bundesliga": "BL1",
+    "Ligue 1": "FL1",
+    "European Championship": "EC",
+    "Serie A": "SA",
+    "Premier League": "PL",
+    'Laliga':4335
+}
 
 
 def Fact():
 	return AI_fetch(promt)
 
 
+
+
+def Football_news():
+
+  try:
+    url = "https://football-news11.p.rapidapi.com/api/news-by-league"
+
+    querystring = {"league_id":"52","lang":"en","page":"1"}
+
+    headers = {
+      "x-rapidapi-key": os.getenv('X_rapidapi'),
+      "x-rapidapi-host": "football-news11.p.rapidapi.com"
+    }
+
+    response = rq.get(url, headers=headers, params=querystring)
+
+    return response.json()
+
+  except Exception:
+    return ''
 
 
 
@@ -73,19 +104,7 @@ class LaLigaData:
 
 
 
-
-
 now=datetime.now()
-competitions = {
-    "FIFA World Cup": "WC",
-    "UEFA Champions League": "CL",
-    "Bundesliga": "BL1",
-    "Ligue 1": "FL1",
-    "European Championship": "EC",
-    "Serie A": "SA",
-    "Premier League": "PL",
-    'Laliga':4335
-}
 
 
 
@@ -126,22 +145,6 @@ class GetData:
             pass
 
 
-
-import time
-
-def Topic():
-    schedule = {}
-    for ids in competitions.keys():
-        if ids == 'Laliga':
-            data = LaLigaData().get_schedule()
-            schedule[ids] = data
-        else:
-            data = GetData(id=competitions[ids]).shedule()
-            schedule[ids] = data
-            time.sleep(1)
-    
-    return schedule
-  
               
          
 
@@ -153,7 +156,8 @@ def Topic():
 
 
 def Select_Topic():
-	return AI_fetch(Selection(ids=competitions,matches=Topic()))
+    
+    return AI_fetch(Selection(ids=competitions,matches=Topic(),news=Football_news()))
 
 
 import ast
@@ -186,63 +190,17 @@ def convert_from_txt_to_list(text):
 	return v
 
 
+import time
 
-def create_post():
-    topic = Select_Topic()
-    data = convert_from_txt_to_dict(text=topic)
-
-    first_key = list(data.keys())[0]
-
-    if first_key == 'FFT':
-        data=Fact()
-        Write([data])
-        return data
-        
-
-    elif first_key == 'Post':
-        ret= data['Post']
-        Write([ret])
-        return ret
-
-    else:
-        dt=convert_from_txt_to_list(text=topic)
-        if dt[0]=='Laliga':
-            info=LaLigaData()
-            listt=[1,2,3,4]
-            
-            if random.choice(listt)==1:
-                #standings
-                dat= Post(compname='Laliga standings',data=info.get_standings())
-                Write([dat])
-                return dat
-            elif random.choice(listt)==2:
-                # Asist
-                dat= Post(compname='Laliga Asist record',data=info.get_top_assists())
-                Write([dat])
-                return dat
-            elif random.choice(listt)==3:
-                #goals
-                dat= Post(compname='Laliga goal record',data=info.get_top_goals())
-                Write([dat])
-                return dat
-            else:
-                # Rattings
-                dat= Post(compname='Average rating for laliga',data=info.get_top_ratings())
-                Write([dat])
-                return dat
-
+def Topic():
+    schedule = {}
+    for ids in competitions.keys():
+        if ids == 'Laliga':
+            data = LaLigaData().get_schedule()
+            schedule[ids] = data
         else:
-            info=GetData(id=competitions[dt[0]])
-            listt=[1,2]
-            
-            if random.choice(listt)==1:
-                # standings
-                dat= Post(compname=f'{dt[0]} standings',data=info.Standings())
-                Write([dat])
-                return dat
-            else:
-                # goals
-                dat= Post(compname=F'{dt[0]} goal record',data=info.Goals())
-                Write([dat])
-                return dat
-        
+            data = GetData(id=competitions[ids]).shedule()
+            schedule[ids] = data
+            time.sleep(1)
+    
+    return schedule

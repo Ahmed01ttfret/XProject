@@ -1,10 +1,11 @@
-from Fetch_Data import create_post
-from Get_Post import Post_tweet
 
+from Create_post import create_post
+from Get_Post import Post_tweet
 try:
     post=create_post()
+    print(post)
     Post_tweet(post)
     print('Done')
 except Exception as e:
-    pass
+    print(e.with_traceback())
 
