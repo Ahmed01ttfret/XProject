@@ -7,5 +7,5 @@ try:
     Post_tweet(post)
     print('Done')
 except Exception as e:
-    print(e.with_traceback())
+    print(e)
 
